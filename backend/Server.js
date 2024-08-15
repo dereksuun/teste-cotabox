@@ -2,13 +2,17 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const helmet = require('helmet'); // Importa o Helmet
-const schema = require('./Schema/Schema'); // Certifique-se de que o caminho está correto
-require('dotenv').config(); // Carrega variáveis de ambiente do arquivo .env
+const helmet = require('helmet');
+const http = require('http');
+const { WebSocketServer } = require('ws');
+const { useServer } = require('graphql-ws/lib/use/ws');
+const schema = require('./Schema/Schema');
+require('dotenv').config();
 
 const app = express();
+const PORT = process.env.PORT || 4000;
 
-// Conecte ao MongoDB
+// Conectar ao MongoDB
 mongoose.connect(process.env.MONGODB_URI);
 mongoose.connection.on('error', (err) => {
   console.error('Erro na conexão com o MongoDB:', err.message);
@@ -26,7 +30,6 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
-      // Adicione outras diretivas conforme necessário
     },
   },
 }));
@@ -40,11 +43,22 @@ const server = new ApolloServer({
   }
 });
 
+// Criar servidor HTTP
+const httpServer = http.createServer(app);
+
 server.start().then(() => {
   server.applyMiddleware({ app, path: '/graphql' });
 
-  const PORT = process.env.PORT || 4000; // Usa a porta definida na variável de ambiente ou 4000 como padrão
-  app.listen(PORT, () => {
-    console.log(`Now listening for requests on port ${PORT}`);
+  // Configurar WebSocket Server para subscriptions
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/graphql'
+  });
+
+  useServer({ schema }, wsServer);
+
+  // Iniciar o servidor HTTP
+  httpServer.listen(PORT, () => {
+    console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
   });
 });

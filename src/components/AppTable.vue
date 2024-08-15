@@ -27,9 +27,9 @@
   </template>
   
   <script>
-  import { useQuery } from '@vue/apollo-composable';
-  import { computed } from 'vue';  // 'ref' removido
+  import { useQuery, useSubscription } from '@vue/apollo-composable';
   import { gql } from '@apollo/client/core';
+  import { computed, watch } from 'vue';
   
   const GET_PARTICIPATIONS = gql`
     query GetParticipations {
@@ -42,11 +42,30 @@
     }
   `;
   
+  const PARTICIPATION_ADDED = gql`
+    subscription {
+      participationAdded {
+        id
+        firstName
+        lastName
+        participation
+      }
+    }
+  `;
+  
   export default {
     name: 'AppTable',
     setup() {
       const { result, loading, error } = useQuery(GET_PARTICIPATIONS);
+      const { result: newParticipation } = useSubscription(PARTICIPATION_ADDED);
+  
       const participations = computed(() => result.value ? result.value.participations : []);
+  
+      watch(newParticipation, (newData) => {
+        if (newData && newData.participationAdded) {
+          participations.value.push(newData.participationAdded);
+        }
+      });
   
       return {
         participations,
