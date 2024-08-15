@@ -10,6 +10,12 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="loading">
+            <td colspan="3">Carregando...</td>
+          </tr>
+          <tr v-if="error">
+            <td colspan="3">Erro ao carregar dados: {{ error.message }}</td>
+          </tr>
           <tr v-for="entry in participations" :key="entry.id">
             <td>{{ entry.firstName }}</td>
             <td>{{ entry.lastName }}</td>
@@ -17,13 +23,12 @@
           </tr>
         </tbody>
       </table>
-      <div v-if="loading">Carregando...</div>
-      <div v-if="error">Erro ao carregar dados: {{ error.message }}</div>
     </div>
   </template>
   
   <script>
   import { useQuery } from '@vue/apollo-composable';
+  import { computed } from 'vue';  // 'ref' removido
   import { gql } from '@apollo/client/core';
   
   const GET_PARTICIPATIONS = gql`
@@ -41,14 +46,15 @@
     name: 'AppTable',
     setup() {
       const { result, loading, error } = useQuery(GET_PARTICIPATIONS);
+      const participations = computed(() => result.value ? result.value.participations : []);
   
       return {
-        participations: result,
+        participations,
         loading,
         error
       };
     }
-  }
+  };
   </script>
   
   <style scoped>
