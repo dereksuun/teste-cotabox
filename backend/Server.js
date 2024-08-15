@@ -2,6 +2,7 @@ const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet'); // Importa o Helmet
 const schema = require('./Schema/Schema'); // Certifique-se de que o caminho está correto
 require('dotenv').config(); // Carrega variáveis de ambiente do arquivo .env
 
@@ -18,6 +19,17 @@ mongoose.connection.once('open', () => {
 
 // Middleware CORS
 app.use(cors());
+
+// Middleware Helmet para configurar CSP
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      // Adicione outras diretivas conforme necessário
+    },
+  },
+}));
 
 // Configurar Apollo Server
 const server = new ApolloServer({
