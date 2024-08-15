@@ -1,5 +1,6 @@
 <template>
     <div>
+      <h1>Dados da Tabela</h1>
       <table>
         <thead>
           <tr>
@@ -9,13 +10,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(entry, index) in participations" :key="index">
+          <tr v-for="entry in participations" :key="entry.id">
             <td>{{ entry.firstName }}</td>
             <td>{{ entry.lastName }}</td>
             <td>{{ entry.participation }}</td>
           </tr>
         </tbody>
       </table>
+      <div v-if="loading">Carregando...</div>
+      <div v-if="error">Erro ao carregar dados: {{ error.message }}</div>
     </div>
   </template>
   
