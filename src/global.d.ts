@@ -1,5 +1,3 @@
-// src/globals.d.ts
 interface Window {
-    Chart: any;
-  }
-  
+  Chart: typeof import('chart.js');
+}
