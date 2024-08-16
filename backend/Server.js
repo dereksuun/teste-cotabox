@@ -27,12 +27,16 @@ app.use(cors());
 // Middleware Helmet para configurar CSP
 app.use(helmet({
   contentSecurityPolicy: {
+    useDefaults: true,
     directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
+      "script-src": ["'self'", "https://cdn.jsdelivr.net", "https://apollo-server-landing-page.cdn.apollographql.com"],
+      "img-src": ["'self'", "data:", "https://apollo-server-landing-page.cdn.apollographql.com"],
+      "default-src": ["'self'"],
+      "connect-src": ["'self'", "ws://localhost:4000"],
     },
   },
 }));
+
 
 // Configurar Apollo Server
 const server = new ApolloServer({
@@ -40,19 +44,23 @@ const server = new ApolloServer({
   formatError: (err) => {
     console.error('Erro no GraphQL:', err.message);
     return { message: err.message };
-  }
+  },
+  subscriptions: {
+    path: '/graphql',
+  },
 });
 
 // Criar servidor HTTP
 const httpServer = http.createServer(app);
 
-server.start().then(() => {
+async function startServer() {
+  await server.start();
   server.applyMiddleware({ app, path: '/graphql' });
 
   // Configurar WebSocket Server para subscriptions
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/graphql'
+    path: '/graphql',
   });
 
   useServer({ schema }, wsServer);
@@ -61,4 +69,8 @@ server.start().then(() => {
   httpServer.listen(PORT, () => {
     console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`);
   });
+}
+
+startServer().catch((err) => {
+  console.error('Erro ao iniciar o servidor:', err);
 });

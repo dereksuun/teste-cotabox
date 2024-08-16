@@ -1,6 +1,9 @@
-const graphql = require('graphql');
-const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID, GraphQLList, GraphQLInt, GraphQLNonNull } = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLSchema, GraphQLID, GraphQLList, GraphQLInt, GraphQLNonNull } = require('graphql');
+const { PubSub } = require('graphql-subscriptions');
 const Participation = require('../models/Participation');
+
+const pubsub = new PubSub();
+const PARTICIPATION_ADDED = 'PARTICIPATION_ADDED';
 
 const ParticipationType = new GraphQLObjectType({
   name: 'Participation',
@@ -46,7 +49,9 @@ const Mutation = new GraphQLObjectType({
           participation: args.participation
         });
         try {
-          return await participation.save();
+          const result = await participation.save();
+          pubsub.publish(PARTICIPATION_ADDED, { participationAdded: result });
+          return result;
         } catch (err) {
           console.error('Erro ao adicionar participação:', err);
           throw new Error('Erro ao adicionar participação: ' + err.message);
@@ -56,7 +61,18 @@ const Mutation = new GraphQLObjectType({
   }
 });
 
+const Subscription = new GraphQLObjectType({
+  name: 'Subscription',
+  fields: {
+    participationAdded: {
+      type: ParticipationType,
+      subscribe: () => pubsub.asyncIterator([PARTICIPATION_ADDED])
+    }
+  }
+});
+
 module.exports = new GraphQLSchema({
   query: RootQuery,
-  mutation: Mutation
+  mutation: Mutation,
+  subscription: Subscription
 });

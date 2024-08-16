@@ -32,6 +32,7 @@ const cache = new InMemoryCache();
 const apolloClient = new ApolloClient({
   link,
   cache,
+  connectToDevTools: true, // Ativa as ferramentas de desenvolvimento do Apollo Client
 });
 
 const apolloProvider = createApolloProvider({

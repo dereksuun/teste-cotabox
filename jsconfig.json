@@ -1,19 +1,29 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "esnext",
-    "baseUrl": "./",
-    "moduleResolution": "node",
+    "target": "es6",                        // Define o alvo de compilação do ECMAScript
+    "module": "commonjs",                   // Define o sistema de módulos como CommonJS
+    "allowJs": true,                        // Permite o uso de arquivos JavaScript
+    "checkJs": true,                        // Habilita verificação de tipo em arquivos JS
+    "noEmit": true,                         // Evita a emissão de arquivos após a compilação
+    "jsx": "preserve",                      // Mantém o JSX ao compilar
+    "moduleResolution": "node",             // Resolve módulos de acordo com o padrão Node.js
+    "baseUrl": ".",                         // Define o diretório base como o diretório raiz do projeto
     "paths": {
-      "@/*": [
-        "src/*"
+      "*": [
+        "node_modules/*",                   // Inclui definições de tipo de node_modules
+        "src/types/*"                       // Opcional: para definições de tipo personalizadas
       ]
     },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
+    "typeRoots": [
+      "node_modules/@types"                 // Inclui todos os tipos do @types no projeto
     ]
-  }
+  },
+  "include": [
+    "src/**/*",                             // Inclui todos os arquivos na pasta src
+    "node_modules/@types/**/*.d.ts"         // Inclui definições de tipo do node_modules/@types
+  ],
+  "exclude": [
+    "node_modules",                         // Exclui a pasta node_modules para evitar duplicação de tipo
+    "dist"                                  // Exclui a pasta dist (ou outra pasta de saída, se houver)
+  ]
 }
