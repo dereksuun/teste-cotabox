@@ -24,6 +24,11 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "npm-force-resolutions": "^0.0.10"
+    "@eslint/js": "^9.9.0",
+    "eslint": "^9.9.0",
+    "eslint-plugin-vue": "^9.27.0",
+    "globals": "^15.9.0",
+    "npm-force-resolutions": "^0.0.10",
+    "typescript-eslint": "^8.1.0"
   }
 }
