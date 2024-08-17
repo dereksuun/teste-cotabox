@@ -2,7 +2,7 @@
   <div>
     <input v-model="firstName" placeholder="First name" />
     <input v-model="lastName" placeholder="Last name" />
-    <input v-model="participation" type="number" placeholder="Participation" />
+    <input v-model.number="participation" type="number" placeholder="Participation" />
     <button @click="submitForm">SEND</button>
     <p v-if="message">{{ message }}</p>
   </div>
@@ -39,7 +39,7 @@ export default {
           variables: {
             firstName: this.firstName,
             lastName: this.lastName,
-            participation: parseInt(this.participation)
+            participation: this.participation
           }
         })
         this.$emit('new-entry', {

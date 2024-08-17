@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "preinstall": "npx npm-force-resolutions"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -18,7 +17,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "graphql": "^16.9.0",
+    "graphql": "16.9.0",
     "graphql-subscriptions": "^2.0.0",
     "helmet": "^7.1.0",
     "mongoose": "^8.5.3",
@@ -35,6 +34,6 @@
     "typescript-eslint": "^8.1.0"
   },
   "resolutions": {
-    "graphql": "^16.9.0"
+    "graphql": "16.9.0"
   }
 }

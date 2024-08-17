@@ -16,7 +16,7 @@
         <tr v-if="error">
           <td colspan="3">Erro ao carregar dados: {{ error.message }}</td>
         </tr>
-        <tr v-for="entry in participationsState.participations" :key="entry.id">
+        <tr v-for="entry in participations" :key="entry.id">
           <td>{{ entry.firstName }}</td>
           <td>{{ entry.lastName }}</td>
           <td>{{ entry.participation }}</td>
@@ -29,8 +29,8 @@
 <script>
 import { useQuery, useSubscription } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
-import { participationsState } from '../store/share';
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
+
 const GET_PARTICIPATIONS = gql`
   query GetParticipations {
     participations {
@@ -56,24 +56,26 @@ const PARTICIPATION_ADDED = gql`
 export default {
   name: 'AppTable',
   setup() {
+    const participations = ref([]);
     const { result, loading, error } = useQuery(GET_PARTICIPATIONS);
     const { result: newParticipation } = useSubscription(PARTICIPATION_ADDED);
 
-    // Atualiza as participações no estado compartilhado quando novos dados são recebidos
+    // Atualiza as participações com os dados do banco
     watch(result, (newResult) => {
       if (newResult && newResult.participations) {
-        participationsState.participations = newResult.participations;
+        participations.value = newResult.participations;
       }
     }, { immediate: true });
 
+    // Adiciona novas participações em tempo real
     watch(newParticipation, (newData) => {
       if (newData && newData.participationAdded) {
-        participationsState.participations.push(newData.participationAdded);
+        participations.value.push(newData.participationAdded);
       }
     });
 
     return {
-      participationsState,
+      participations,
       loading,
       error,
     };
