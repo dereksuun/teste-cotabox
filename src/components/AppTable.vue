@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Dados da Tabela</h1>
+    <h1>Participation data</h1>
     <table>
       <thead>
         <tr>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { useQuery, useSubscription } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import { ref, watch } from 'vue';
 
@@ -42,37 +42,31 @@ const GET_PARTICIPATIONS = gql`
   }
 `;
 
-const PARTICIPATION_ADDED = gql`
-  subscription {
-    participationAdded {
-      id
-      firstName
-      lastName
-      participation
-    }
-  }
-`;
-
 export default {
   name: 'AppTable',
   setup() {
     const participations = ref([]);
-    const { result, loading, error } = useQuery(GET_PARTICIPATIONS);
-    const { result: newParticipation } = useSubscription(PARTICIPATION_ADDED);
+    
+    // Usando useQuery com pollInterval para verificar atualizações a cada 5 segundos
+    const { result, loading, error, onResult } = useQuery(GET_PARTICIPATIONS, {
+      pollInterval: 1000, // Verifica por atualizações a cada 5 segundos
+      fetchPolicy: 'no-cache', // Garante que a consulta sempre pega dados do servidor
+    });
+
+    onResult(({ data }) => {
+  console.log('onResult triggered:', data);
+  if (data && data.participations) {
+    participations.value = data.participations;
+  }
+});
 
     // Atualiza as participações com os dados do banco
     watch(result, (newResult) => {
+      console.log('Polling result:', newResult); // Diagnóstico para verificar o polling
       if (newResult && newResult.participations) {
         participations.value = newResult.participations;
       }
     }, { immediate: true });
-
-    // Adiciona novas participações em tempo real
-    watch(newParticipation, (newData) => {
-      if (newData && newData.participationAdded) {
-        participations.value.push(newData.participationAdded);
-      }
-    });
 
     return {
       participations,
@@ -85,7 +79,7 @@ export default {
 
 <style scoped>
 table {
-  width: 50%;
+  width: 100%;
   border-collapse: collapse;
 }
 

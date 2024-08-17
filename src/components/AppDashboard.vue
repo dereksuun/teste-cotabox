@@ -51,6 +51,9 @@ export default {
         this.firstName = ''
         this.lastName = ''
         this.participation = 0
+
+        // Função de refresh na página
+        window.location.reload(); // Faz o refresh da página após o envio dos dados
       } catch (error) {
         this.message = 'Erro ao adicionar participação: ' + error.message
       }
@@ -70,14 +73,14 @@ input {
 
 button {
   padding: 10px 15px;
-  background-color: #42b983;
+  background-color: #141c64;
   color: white;
   border: none;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #369f6e;
+  background-color: #4374e4;
 }
 
 p {
