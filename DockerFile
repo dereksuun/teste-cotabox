@@ -1,0 +1,20 @@
+# Usar a imagem oficial do Node.js (versão 20.12.0) como base
+FROM node:20.12.0
+
+# Definir o diretório de trabalho dentro do contêiner
+WORKDIR /usr/src/app
+
+# Copiar os arquivos package.json e package-lock.json para o contêiner
+COPY package*.json ./
+
+# Instalar as dependências do projeto
+RUN npm install
+
+# Copiar o restante do código do projeto para o contêiner
+COPY . .
+
+# Expor a porta que o aplicativo vai usar
+EXPOSE 4000
+
+# Comando para rodar o servidor
+CMD ["node", "server.js"]
